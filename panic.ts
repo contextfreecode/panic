@@ -7,9 +7,9 @@ async function wait(duration: number) {
 }
 
 async function getUser(id: number) {
-  await wait(100);
+  await wait(0); // or longer
   if (id === 2) {
-    throw new CustomError("404 - User does not exist");
+    throw new NotFoundError("404 - User does not exist");
   }
   return { id, name: "Kyle" };
 }
@@ -43,8 +43,8 @@ function catchErrorTyped<T, E extends new (message?: string) => Error>(
     });
 }
 
-class CustomError extends Error {
-  name = "CustomError";
+class NotFoundError extends Error {
+  name = "NotFoundError";
   extraProp = "ERROR: test";
 }
 
@@ -67,7 +67,7 @@ async function demoHelper(id: number) {
 }
 
 async function demoHelperTyped(id: number) {
-  const [error, user] = await catchErrorTyped(getUser(id), [CustomError]);
+  const [error, user] = await catchErrorTyped(getUser(id), [NotFoundError]);
   if (error) {
     console.log("There was an error:", error.message);
   } else {

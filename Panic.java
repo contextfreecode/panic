@@ -5,14 +5,18 @@ import java.util.stream.IntStream;
 
 class Panic {
     public static void main(String[] args) {
-        // List.of(1, 2, 3).stream()
-        List.of(1, 2).stream()
-            .map(id -> throwingUnchecked(() -> retrieveText(id)))
-            .forEach(text -> {
-                var codes = stringToCodes(text);
-                rotateBack(codes);
-                System.out.println(codesToString(codes));
-            });
+        try {
+            IntStream.range(1, 4)
+                .mapToObj(id -> throwingUnchecked(() -> retrieveText(id)))
+                .forEach(text -> {
+                    var codes = stringToCodes(text);
+                    rotateBack(codes);
+                    System.out.println(codesToString(codes));
+                });
+        } catch (Exception exception) {
+            // exception.printStackTrace();
+            System.err.println(exception);
+        }
     }
 
     static List<String> texts = List.of("smile", "tears");

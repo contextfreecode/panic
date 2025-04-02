@@ -66,7 +66,9 @@ struct PanicHookDisable {
 impl PanicHookDisable {
     fn new() -> Self {
         let former = Some(panic::take_hook());
-        panic::set_hook(Box::new(|_| {}));
+        panic::set_hook(Box::new(|_| {
+            // std::process::exit(1);
+        }));
         Self { former }
     }
 }

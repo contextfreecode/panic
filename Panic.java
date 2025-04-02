@@ -1,21 +1,30 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 class Panic {
     public static void main(String[] args) {
+        // codesToString(List.of(0x110000));
         try {
             IntStream.range(1, 4)
-                .mapToObj(id -> throwingUnchecked(() -> retrieveText(id)))
+                .mapToObj(id -> processText(id))
                 .forEach(text -> {
-                    var codes = stringToCodes(text);
-                    rotateBack(codes);
-                    System.out.println(codesToString(codes));
+                    System.out.println(text);
                 });
         } catch (Exception exception) {
             // exception.printStackTrace();
             System.err.println(exception);
+        }
+    }
+
+    static String processText(int id) {
+        try {
+            var text = retrieveText(id);
+            var codes = new ArrayList<>(stringToCodes(text));
+            rotateBack(codes);
+            return codesToString(codes);
+        } catch (NotFoundException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
@@ -43,24 +52,12 @@ class Panic {
 
     static String codesToString(List<Integer> codes) {
         var array = codes.stream().mapToInt(Integer::intValue).toArray();
+        // Throws on large ints.
         return new String(array, 0, array.length);
     }
 
     static List<Integer> stringToCodes(String text) {
-        // Collect into mutable list in this case.
-        return text.codePoints().boxed().collect(
-            Collectors.toCollection(ArrayList::new)
-        );
-    }
-
-    static <T, E extends Exception> T throwingUnchecked(
-        ThrowingSupplier<T, E> supplier
-    ) throws RuntimeException {
-        try {
-            return supplier.get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return text.codePoints().boxed().toList();
     }
 }
 

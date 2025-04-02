@@ -17,8 +17,6 @@ class Panic
         }
     }
 
-    static readonly List<string> Texts = new() { "smile", "tears" };
-
     static string ProcessText(int id)
     {
         var text = RetrieveText(id);
@@ -26,6 +24,8 @@ class Panic
         RotateBack(runes);
         return RunesToString(runes);
     }
+
+    static readonly List<string> Texts = new() { "smile", "tears" };
 
     /// <exception cref="NotFoundException"></exception>
     static string RetrieveText(int id)

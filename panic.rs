@@ -1,30 +1,29 @@
 #![allow(dead_code, clippy::redundant_closure)]
 
-use std::sync::LazyLock;
+use std::{panic, sync::LazyLock};
 
 fn main() -> Result<(), Error> {
-    std::panic::catch_unwind(|| {
-        for result in (1..=3).map(|x| retrieve_text(x)) {
-            match result {
-                Ok(text) => {
-                    let mut codes = str_to_chars(&text);
-                    rotate_back(&mut codes);
-                    println!("{}", chars_to_string(&codes));
-                }
-                Err(_) => println!("{:?}", result),
-            }
+    let _hook_disable = PanicHookDisable::new();
+    panic::catch_unwind(|| {
+        for text in (1..=3).map(|x| process_text(x)) {
+            println!("{text}");
         }
     })
     .map_err(|err| {
-        println!("totally panicked");
-        Error::Panic(err)
+        // println!("totally panicked");
+        let message = match err.downcast::<String>() {
+            Ok(message) => *message,
+            Err(err) => format!("{err:?}"),
+        };
+        Error::Panic(message)
     })
 }
 
-#[derive(Debug)]
-enum Error {
-    NotFound(String),
-    Panic(Box<dyn std::any::Any + Send>),
+fn process_text(id: i32) -> String {
+    let text = retrieve_text(id).unwrap_or_else(|err| panic!("{err:?}"));
+    let mut codes = str_to_chars(&text);
+    rotate_back(&mut codes);
+    chars_to_string(&codes)
 }
 
 // static TEXTS: [&str; 2] = ["smile", "tears"];
@@ -55,4 +54,28 @@ fn chars_to_string(codes: &[char]) -> String {
 
 fn str_to_chars(text: &str) -> Vec<char> {
     text.chars().collect()
+}
+
+#[derive(Debug)]
+enum Error {
+    NotFound(String),
+    Panic(String),
+}
+
+struct PanicHookDisable {
+    former: Box<dyn Fn(&panic::PanicHookInfo) + Sync + Send + 'static>,
+}
+
+impl PanicHookDisable {
+    fn new() -> Self {
+        let former = panic::take_hook();
+        panic::set_hook(Box::new(|_| {}));
+        Self { former }
+    }
+}
+
+impl Drop for PanicHookDisable {
+    fn drop(&mut self) {
+        panic::set_hook(std::mem::replace(&mut self.former, Box::new(|_| {})));
+    }
 }

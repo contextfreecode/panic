@@ -1,22 +1,20 @@
-#![allow(dead_code, clippy::redundant_closure)]
+#![allow(dead_code, clippy::redundant_closure, clippy::type_complexity)]
 
 use std::{panic, sync::LazyLock};
 
-fn main() -> Result<(), Error> {
+fn main() {
     let _hook_disable = PanicHookDisable::new();
-    panic::catch_unwind(|| {
+    if let Err(err) = panic::catch_unwind(|| {
         for text in (1..=3).map(|x| process_text(x)) {
             println!("{text}");
         }
-    })
-    .map_err(|err| {
-        // println!("totally panicked");
+    }) {
         let message = match err.downcast::<String>() {
             Ok(message) => *message,
             Err(err) => format!("{err:?}"),
         };
-        Error::Panic(message)
-    })
+        println!("panic: {message}");
+    }
 }
 
 fn process_text(id: i32) -> String {
@@ -59,16 +57,15 @@ fn str_to_chars(text: &str) -> Vec<char> {
 #[derive(Debug)]
 enum Error {
     NotFound(String),
-    Panic(String),
 }
 
 struct PanicHookDisable {
-    former: Box<dyn Fn(&panic::PanicHookInfo) + Sync + Send + 'static>,
+    former: Option<Box<dyn Fn(&panic::PanicHookInfo) + Sync + Send + 'static>>,
 }
 
 impl PanicHookDisable {
     fn new() -> Self {
-        let former = panic::take_hook();
+        let former = Some(panic::take_hook());
         panic::set_hook(Box::new(|_| {}));
         Self { former }
     }
@@ -76,6 +73,6 @@ impl PanicHookDisable {
 
 impl Drop for PanicHookDisable {
     fn drop(&mut self) {
-        panic::set_hook(std::mem::replace(&mut self.former, Box::new(|_| {})));
+        panic::set_hook(self.former.take().unwrap());
     }
 }

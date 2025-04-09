@@ -12,7 +12,7 @@ fn recover(on_error: fn(ExternalError) -> a, body: fn() -> a) -> a
 
 pub fn main() {
   run()
-  io.println("Recovered.")
+  io.println("Still alive.")
 }
 
 pub fn run() {

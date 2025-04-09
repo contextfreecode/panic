@@ -12,11 +12,30 @@ typedef enum pan_Error {
 } pan_Error;
 
 void pan_handle_abort(int sig);
+void pan_main(int state);
 char* pan_process_text(int id);
 pan_Error pan_retrieve_text(char** result, int id);
 void pan_rotate_back_char(char* text);
+void pan_run(void);
 
 int main(void) {
+    pan_run();
+    printf("Still alive.\n");
+    // pan_main(0);
+}
+
+void pan_main(int state) {
+    switch (state) {
+        case 0:
+            pan_run();
+            // Fall through on purpose.
+        case 1:
+            printf("Still alive.\n");
+            break;
+    }
+}
+
+void pan_run(void) {
     void (*old_handler)(int) = signal(SIGABRT, pan_handle_abort);
     assert(old_handler != SIG_ERR);
     for (int id = 1; id <= 3; id += 1) {
@@ -29,12 +48,14 @@ int main(void) {
 
 void pan_handle_abort(int sig) {
     printf("Run aborted.\n");
+    pan_main(1);
 }
 
 char* pan_process_text(int id) {
     char* text;
     pan_Error error = pan_retrieve_text(&text, id);
     assert(!error);
+    // if (error) abort();
     // TODO Actual Unicode code points as a future exercise.
     pan_rotate_back_char(text);
     return text;

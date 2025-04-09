@@ -4,6 +4,11 @@ import java.util.stream.IntStream;
 
 class Panic {
     public static void main(String[] args) {
+        run();
+        System.out.println("Still alive.");
+    }
+
+    static void run() {
         // codesToString(List.of(0x110000));
         try {
             IntStream.range(1, 4)

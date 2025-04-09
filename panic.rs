@@ -3,6 +3,11 @@
 use std::{panic, sync::LazyLock};
 
 fn main() {
+    run();
+    println!("Still alive.");
+}
+
+fn run() {
     let _hook_disable = PanicHookDisable::new();
     if let Err(err) = panic::catch_unwind(|| {
         for text in (1..=3).map(|x| process_text(x)) {

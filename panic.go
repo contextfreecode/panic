@@ -3,6 +3,11 @@ package main
 import "fmt"
 
 func main() {
+	run()
+	fmt.Println("Still alive.")
+}
+
+func run() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("panic:", r)

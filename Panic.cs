@@ -4,6 +4,11 @@ class Panic
 {
     static void Main()
     {
+        Run();
+        Console.WriteLine("Still alive.");
+    }
+
+    static void Run() {
         try
         {
             foreach (var text in Enumerable.Range(1, 3).Select(ProcessText))

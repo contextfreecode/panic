@@ -4,9 +4,23 @@ import gleam/list
 import gleam/result
 import gleam/string
 
+type ExternalError
+
+@external(erlang, "recover", "recover")
+@external(javascript, "./recover.mjs", "recover")
+fn recover(on_error: fn(ExternalError) -> a, body: fn() -> a) -> a
+
 pub fn main() {
-  // https://tour.gleam.run/advanced-features/externals/
-  list.range(1, 3)
+  run()
+  io.println("Recovered.")
+}
+
+pub fn run() {
+  use <- recover(fn(err) {
+    echo err
+    Nil
+  })
+  list.range(1, 4)
   |> list.each(fn(text) {
     text
     |> process_text()
@@ -24,7 +38,7 @@ fn process_text(id: Int) -> String {
   |> string.from_utf_codepoints()
 }
 
-const texts = ["smile", "tears", "🐻‍❄️"]
+const texts = ["smile", "tears", "🐻‍❄️❤️🦭"]
 
 fn retrieve_text(id: Int) -> Result(String, Error) {
   case Nil {

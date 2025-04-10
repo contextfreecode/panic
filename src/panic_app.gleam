@@ -34,11 +34,11 @@ fn process_text(id: Int) -> String {
   |> result.map_error(fn(err) { panic as string.inspect(err) })
   |> result.unwrap("never fails")
   |> string.to_utf_codepoints()
-  |> rotate_back()
+  |> list.reverse()
   |> string.from_utf_codepoints()
 }
 
-const texts = ["smile", "tears", "🐻‍❄️❤️🦭"]
+const texts = ["tar", "flow", "🐻‍❄️❤️🦭"]
 
 fn retrieve_text(id: Int) -> Result(String, Error) {
   case Nil {
@@ -51,11 +51,6 @@ fn retrieve_text(id: Int) -> Result(String, Error) {
   |> result.map_error(fn(_) {
     NotFoundError("404 - Not found: " <> int.to_string(id))
   })
-}
-
-fn rotate_back(codes: List(a)) -> List(a) {
-  [codes |> list.drop(1), codes |> list.take(1)]
-  |> list.flatten()
 }
 
 type Error {

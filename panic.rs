@@ -25,12 +25,12 @@ fn run() {
 fn process_text(id: i32) -> String {
     let text = retrieve_text(id).unwrap_or_else(|err| panic!("{err:?}"));
     let mut codes = str_to_chars(&text);
-    rotate_back(&mut codes);
+    reverse_in_place(&mut codes);
     chars_to_string(&codes)
 }
 
-// static TEXTS: [&str; 2] = ["smile", "tears"];
-static TEXTS: LazyLock<Vec<&str>> = LazyLock::new(|| vec!["smile", "tears"]);
+// static TEXTS: [&str; 2] = ["tar", "flow"];
+static TEXTS: LazyLock<Vec<&str>> = LazyLock::new(|| vec!["tar", "flow"]);
 
 fn retrieve_text(id: i32) -> Result<String, Error> {
     match TEXTS.get((id - 1) as usize) {
@@ -39,16 +39,12 @@ fn retrieve_text(id: i32) -> Result<String, Error> {
     }
 }
 
-fn rotate_back<T: Copy>(vals: &mut [T]) {
-    let len = vals.len();
-    // if len == 0 {
-    //     return;
-    // }
-    let first = vals[0];
-    for index in 1..len {
-        vals[index - 1] = vals[index];
+fn reverse_in_place<T: Copy>(values: &mut [T]) {
+    let len = values.len();
+    for index in 0..len / 2 {
+        let reverse_index = len - index - 1;
+        values.swap(index, reverse_index);
     }
-    vals[len - 1] = first;
 }
 
 fn chars_to_string(codes: &[char]) -> String {

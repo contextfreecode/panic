@@ -15,7 +15,7 @@ void pan_handle_abort(int sig);
 void pan_main(int state);
 char* pan_process_text(int id);
 pan_Error pan_retrieve_text(char** result, int id);
-void pan_rotate_back_char(char* text);
+void pan_string_reverse_in_place(char* text);
 void pan_run(void);
 
 int main(void) {
@@ -57,11 +57,11 @@ char* pan_process_text(int id) {
     assert(!error);
     // if (error) abort();
     // TODO Actual Unicode code points as a future exercise.
-    pan_rotate_back_char(text);
+    pan_string_reverse_in_place(text);
     return text;
 }
 
-const char *const pan_texts[] = {"smile", "tears"};
+const char *const pan_texts[] = {"tar", "flow"};
 const size_t pan_texts_len = sizeof(pan_texts) / sizeof(*pan_texts);
 
 pan_Error pan_retrieve_text(char** result, int id) {
@@ -72,12 +72,12 @@ pan_Error pan_retrieve_text(char** result, int id) {
     return pan_Error_Ok;
 }
 
-void pan_rotate_back_char(char* text) {
+void pan_string_reverse_in_place(char* text) {
     size_t len = strlen(text);
-    if (!len) return;
-    char first = text[0];
-    for (size_t index = 1; index < len; index += 1) {
-        text[index - 1] = text[index];
+    for (size_t index = 0; index < len / 2; index += 1) {
+        size_t reverse_index = len - index - 1;
+        char reverse_value = text[reverse_index];
+        text[reverse_index] = text[index];
+        text[index] = reverse_value;
     }
-    text[len - 1] = first;
 }

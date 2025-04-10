@@ -19,7 +19,7 @@ func run() {
 	}
 }
 
-var texts = []string{"smile", "tears"}
+var texts = []string{"tar", "flow"}
 
 func processText(id int) string {
 	text, err := retrieveText(id)
@@ -27,7 +27,7 @@ func processText(id int) string {
 		panic(err)
 	}
 	codes := []rune(text)
-	rotateBack(codes)
+	reverseInPlace(codes)
 	return string(codes)
 }
 
@@ -39,17 +39,13 @@ func retrieveText(id int) (string, error) {
 	return "", NotFoundError{Message: fmt.Sprintf("404 - Not found: %d", id)}
 }
 
-func rotateBack[T any](vals []T) {
-	valsLen := len(vals)
-	// if valsLen == 0 {
-	// 	return
-	// }
-	first := vals[0]
-	// copy(vals[:valsLen-1], vals[1:])
-	for i := 1; i < valsLen; i += 1 {
-		vals[i-1] = vals[i]
+func reverseInPlace[T any](values []T) {
+	valuesLen := len(values)
+	for index := 0; index < valuesLen/2; index += 1 {
+		reverseIndex := valuesLen - index - 1
+		values[index], values[reverseIndex] =
+			values[reverseIndex], values[index]
 	}
-	vals[valsLen-1] = first
 }
 
 type NotFoundError struct {

@@ -8,7 +8,8 @@ class Panic
         Console.WriteLine("Still alive.");
     }
 
-    static void Run() {
+    static void Run()
+    {
         try
         {
             foreach (var text in Enumerable.Range(1, 3).Select(ProcessText))
@@ -26,11 +27,11 @@ class Panic
     {
         var text = RetrieveText(id);
         var runes = StringToRunes(text);
-        RotateBack(runes);
+        ReverseInPlace(runes);
         return RunesToString(runes);
     }
 
-    static readonly List<string> Texts = new() { "smile", "tears" };
+    static readonly List<string> Texts = new() { "tar", "flow" };
 
     /// <exception cref="NotFoundException"></exception>
     static string RetrieveText(int id)
@@ -42,15 +43,14 @@ class Panic
         return Texts[id - 1];
     }
 
-    static void RotateBack<T>(List<T> vals)
+    static void ReverseInPlace<T>(List<T> values)
     {
-        // if (vals.Count == 0) return;
-        var first = vals[0];
-        for (int i = 1; i < vals.Count; i++)
+        for (int index = 0; index < values.Count / 2; index++)
         {
-            vals[i - 1] = vals[i];
+            var reverseIndex = index + 1;
+            (values[index], values[^reverseIndex]) =
+                (values[^reverseIndex], values[index]);
         }
-        vals[^1] = first;
     }
 
     static string RunesToString(List<Rune> runes) => string.Concat(runes);

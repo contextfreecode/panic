@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -11,11 +12,11 @@ class Panic {
     static void run() {
         // codesToString(List.of(0x110000));
         try {
-            IntStream.range(1, 4)
-                .mapToObj(id -> processText(id))
-                .forEach(text -> {
-                    System.out.println(text);
-                });
+            IntStream.range(1, 3)
+                    .mapToObj(id -> processText(id))
+                    .forEach(text -> {
+                        System.out.println(text);
+                    });
         } catch (Exception exception) {
             // exception.printStackTrace();
             System.err.println(exception);
@@ -26,14 +27,14 @@ class Panic {
         try {
             var text = retrieveText(id);
             var codes = new ArrayList<>(stringToCodes(text));
-            rotateBack(codes);
+            reverseInPlace(codes);
             return codesToString(codes);
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    static List<String> texts = List.of("smile", "tears");
+    static List<String> texts = List.of("tar", "flow");
 
     static String retrieveText(int id) throws NotFoundException {
         if (id <= 0 || id > texts.size()) {
@@ -43,16 +44,11 @@ class Panic {
         return texts.get(id - 1);
     }
 
-    static <T> void rotateBack(List<T> vals) {
-        var size = vals.size();
-        // if (size == 0) {
-        //     return;
-        // }
-        var first = vals.get(0);
-        IntStream.range(1, size).forEach(index -> {
-            vals.set(index - 1, vals.get(index));
-        });
-        vals.set(size - 1, first);
+    static <T> void reverseInPlace(List<T> values) {
+        var size = values.size();
+        for (var index = 0; index < size / 2; index += 1) {
+            Collections.swap(values, index, size - index - 1);
+        }
     }
 
     static String codesToString(List<Integer> codes) {

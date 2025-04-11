@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 class Panic {
@@ -26,7 +27,7 @@ class Panic {
     static String processText(int id) {
         try {
             var text = retrieveText(id);
-            var codes = new ArrayList<>(stringToCodes(text));
+            var codes = stringToCodes(text);
             reverseInPlace(codes);
             return codesToString(codes);
         } catch (NotFoundException exception) {
@@ -58,7 +59,8 @@ class Panic {
     }
 
     static List<Integer> stringToCodes(String text) {
-        return text.codePoints().boxed().toList();
+        return text.codePoints().boxed().collect(
+                Collectors.toCollection(ArrayList::new));
     }
 }
 

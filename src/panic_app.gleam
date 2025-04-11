@@ -38,7 +38,8 @@ fn process_text(id: Int) -> String {
   |> string.from_utf_codepoints()
 }
 
-const texts = ["tar", "flow", "🐻‍❄️❤️🦭"]
+// const texts = ["tar", "flow", "🐻‍❄️❤️🦭"]
+const texts = ["tar", "flow"]
 
 fn retrieve_text(id: Int) -> Result(String, Error) {
   case Nil {

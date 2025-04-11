@@ -67,8 +67,3 @@ class NotFoundException extends Exception {
         super(message);
     }
 }
-
-@FunctionalInterface
-interface ThrowingSupplier<T, E extends Exception> {
-    T get() throws E;
-}

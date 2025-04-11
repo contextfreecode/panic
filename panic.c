@@ -48,7 +48,7 @@ void pan_run(void) {
 
 void pan_handle_abort(int sig) {
     printf("Run aborted.\n");
-    pan_main(1);
+    // pan_main(1);
 }
 
 char* pan_process_text(int id) {

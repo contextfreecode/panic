@@ -21,8 +21,8 @@ pub fn run() {
     Nil
   })
   list.range(1, 4)
-  |> list.each(fn(text) {
-    text
+  |> list.each(fn(id) {
+    id
     |> process_text()
     |> io.println()
   })

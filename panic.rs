@@ -1,6 +1,6 @@
 #![allow(dead_code, clippy::redundant_closure, clippy::type_complexity)]
 
-use std::{panic, sync::LazyLock};
+use std::panic;
 
 fn main() {
     run();
@@ -29,8 +29,7 @@ fn process_text(id: i32) -> String {
     chars_to_string(&codes)
 }
 
-// static TEXTS: [&str; 2] = ["tar", "flow"];
-static TEXTS: LazyLock<Vec<&str>> = LazyLock::new(|| vec!["tar", "flow"]);
+static TEXTS: &[&str] = &["tar", "flow"];
 
 fn retrieve_text(id: i32) -> Result<String, Error> {
     match TEXTS.get((id - 1) as usize) {

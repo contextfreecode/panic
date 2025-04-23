@@ -38,7 +38,7 @@ fn retrieve_text(id: i32) -> Result<String, Error> {
     }
 }
 
-fn reverse_in_place<T: Copy>(values: &mut [T]) {
+fn reverse_in_place<T>(values: &mut [T]) {
     let len = values.len();
     for index in 0..len / 2 {
         let reverse_index = len - index - 1;

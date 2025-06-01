@@ -1,6 +1,10 @@
 import std/core/exn
 
 pub fun main()
+  run()
+  println("Still alive.")
+
+pub fun run()
   for(1, 3) fn(id)
     val result = process-text(id)
     println(result)

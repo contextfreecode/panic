@@ -4,14 +4,12 @@ pub fun main()
   run()
   println("Still alive.")
 
-pub fun run()
+pub fun run(): console ()
+  with final ctl throw-exn(exn)
+    println("exn: " ++ exn.show)
   for(1, 3) fn(id)
     val result = process-text(id)
     println(result)
-    // val result = retrieve-text(id)
-    // match result
-    //   Error(exception) -> println("error: " ++ exception.show)
-    //   Ok(result) -> println(result)
 
 pub fun my-for(start: int, end: int, action: (int) -> ()): ()
   for(start, end, action)

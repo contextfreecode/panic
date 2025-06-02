@@ -7,6 +7,8 @@ pub fn main() void {
 }
 
 fn run(allocator: std.mem.Allocator) void {
+    // For panic recovery, if we want to be abusive, see:
+    // https://github.com/dimdin/zig-recover/blob/main/src/recover.zig
     runLoop(allocator) catch |err| {
         std.debug.print("Error: {}\n", .{err});
     };

@@ -13,7 +13,7 @@ class Panic {
     static void run() {
         // codesToString(List.of(0x110000));
         try {
-            IntStream.range(1, 3)
+            IntStream.range(1, 4)
                     .mapToObj(id -> processText(id))
                     .forEach(text -> {
                         System.out.println(text);
@@ -28,7 +28,7 @@ class Panic {
         try {
             var text = retrieveText(id);
             var codes = stringToCodes(text);
-            reverseInPlace(codes);
+            Collections.reverse(codes);
             return codesToString(codes);
         } catch (NotFoundException exception) {
             throw new RuntimeException(exception);
@@ -36,6 +36,7 @@ class Panic {
     }
 
     static List<String> texts = List.of("tar", "flow");
+    // static List<String> texts = List.of("tar", "flow", "🐻‍❄️❤️🦭");
 
     static String retrieveText(int id) throws NotFoundException {
         if (id <= 0 || id > texts.size()) {
@@ -43,13 +44,6 @@ class Panic {
             throw new NotFoundException(message);
         }
         return texts.get(id - 1);
-    }
-
-    static <T> void reverseInPlace(List<T> values) {
-        var size = values.size();
-        for (var index = 0; index < size / 2; index += 1) {
-            Collections.swap(values, index, size - index - 1);
-        }
     }
 
     static String codesToString(List<Integer> codes) {

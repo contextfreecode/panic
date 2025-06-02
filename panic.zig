@@ -1,20 +1,21 @@
 const std = @import("std");
 
-pub fn main() !void {
-    run() catch |err| {
-        std.debug.print("Error: {}\n", .{err});
-    };
+pub fn main() void {
+    const allocator = std.heap.page_allocator;
+    run(allocator);
     std.debug.print("Still alive.\n", .{});
 }
 
-fn run() !void {
-    const allocator = std.heap.page_allocator;
+fn run(allocator: std.mem.Allocator) void {
+    runLoop(allocator) catch |err| {
+        std.debug.print("Error: {}\n", .{err});
+    };
+}
+
+fn runLoop(allocator: std.mem.Allocator) !void {
     var i: usize = 1;
     while (i <= 3) : (i += 1) {
-        const text = processText(allocator, i) catch |err| {
-            std.debug.print("Error: {}\n", .{err});
-            continue;
-        };
+        const text = try processText(allocator, i);
         defer allocator.free(text);
         std.debug.print("{s}\n", .{text});
     }

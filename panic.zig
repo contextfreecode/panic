@@ -10,48 +10,68 @@ pub fn main() void {
 }
 
 fn run(allocator: std.mem.Allocator) void {
-    recover.call(runLoop, .{allocator}) catch |err| {
+    recover.call(struct {
+        pub fn loop(alloc: std.mem.Allocator) void {
+            for (1..4) |id| {
+                const text = processText(alloc, id);
+                defer alloc.free(text);
+                std.debug.print("{s}\n", .{text});
+            }
+        }
+    }.loop, .{allocator}) catch |err| {
         std.debug.print("Error: {}\n", .{err});
     };
+    // forRange(1, 3, error{}, struct {
+    //     pub fn process(id: usize, args: anytype) error{}!void {
+    //         const alloc = args[0];
+    //         const text = processText(alloc, id);
+    //         defer alloc.free(text);
+    //         std.debug.print("{s}\n", .{text});
+    //     }
+    // }.process, .{allocator}) catch unreachable;
 }
 
-fn runLoop(allocator: std.mem.Allocator) void {
-    var i: usize = 1;
-    while (i <= 3) : (i += 1) {
-        const text = processText(allocator, i);
-        defer allocator.free(text);
-        std.debug.print("{s}\n", .{text});
+fn forRange(
+    start: usize,
+    end: usize,
+    errs: type,
+    f: fn (i: usize, args: anytype) errs!void,
+    args: anytype,
+) errs!void {
+    for (start..end) |i| {
+        try @call(.auto, f, .{ i, args });
     }
 }
 
 fn processText(allocator: std.mem.Allocator, id: usize) []const u8 {
     // TODO Any kind of nested function pointer example here?
     const text = retrieveText(id) catch @panic("retrieveText failed");
-    const retrieveSize = compose(error{NotFound}, struct {
-        pub fn len(again: []const u8) usize {
-            return again.len;
-        }
-    }.len, retrieveText);
-    std.debug.print("{} ", .{retrieveSize(id) catch unreachable});
+    // const retrieveSize = compose(error{NotFound}, struct {
+    //     pub fn len(again: []const u8) usize {
+    //         return again.len;
+    //     }
+    // }.len, retrieveText);
+    // std.debug.print("{} ", .{retrieveSize(.{id}) catch @panic("retrieveSize failed")});
     const codes = stringToCodes(allocator, text) catch @panic("stringToCodes failed");
     defer allocator.free(codes);
     std.mem.reverse(u21, codes);
     return codesToString(allocator, codes) catch @panic("codesToString failed");
 }
 
-pub fn compose(
+fn compose(
     errs: type,
     f: anytype,
     g: anytype,
 ) fn (
-    x: @typeInfo(@TypeOf(g)).@"fn".params[0].type.?,
+    // x: @typeInfo(@TypeOf(g)).@"fn".params[0].type.?,
+    args: anytype,
 ) errs!@typeInfo(@TypeOf(f)).@"fn".return_type.? {
     // const gInfo = @typeInfo(@TypeOf(g));
-    const Arg = @typeInfo(@TypeOf(g)).@"fn".params[0].type.?;
+    // const Arg = @typeInfo(@TypeOf(g)).@"fn".params[0].type.?;
     const Ret = @typeInfo(@TypeOf(f)).@"fn".return_type.?;
     return struct {
-        pub fn call(x: Arg) errs!Ret {
-            return f(try g(x));
+        pub fn call(args: anytype) errs!Ret {
+            return f(try @call(.auto, g, args));
         }
     }.call;
 }

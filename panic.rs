@@ -25,9 +25,7 @@ fn run() {
 
 fn process_text(id: i32) -> String {
     let text = retrieve_text(id).unwrap_or_else(|err| panic!("{err:?}"));
-    let mut codes = str_to_chars(&text);
-    codes.reverse();
-    chars_to_string(&codes)
+    text.chars().rev().collect()
 }
 
 static TEXTS: &[&str] = &["tar", "flow"];
@@ -38,14 +36,6 @@ fn retrieve_text(id: i32) -> Result<String, Error> {
         Some(text) => Ok(text.to_string()),
         _ => Err(Error::NotFound(format!("404 - Not found: {id}"))),
     }
-}
-
-fn chars_to_string(codes: &[char]) -> String {
-    codes.iter().collect()
-}
-
-fn str_to_chars(text: &str) -> Vec<char> {
-    text.chars().collect()
 }
 
 #[derive(Debug)]

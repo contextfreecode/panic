@@ -25,11 +25,33 @@ fn runLoop(allocator: std.mem.Allocator) void {
 }
 
 fn processText(allocator: std.mem.Allocator, id: usize) []const u8 {
+    // TODO Any kind of nested function pointer example here?
     const text = retrieveText(id) catch @panic("retrieveText failed");
+    // const retrieveSize = compose(struct {
+    //     pub fn len(again: []const u8) usize {
+    //         return again.len;
+    //     }
+    // }.len, retrieveText);
+    // std.debug.print("{} ", .{retrieveSize(id)});
     const codes = stringToCodes(allocator, text) catch @panic("stringToCodes failed");
     defer allocator.free(codes);
     std.mem.reverse(u21, codes);
     return codesToString(allocator, codes) catch @panic("codesToString failed");
+}
+
+pub fn compose(
+    f: anytype,
+    g: anytype,
+) fn (
+    x: @typeInfo(@TypeOf(g)).@"fn".params[0].type.?,
+) @typeInfo(@TypeOf(f)).@"fn".return_type.? {
+    const Arg = @typeInfo(@TypeOf(g)).@"fn".params[0].type.?;
+    const Ret = @typeInfo(@TypeOf(f)).@"fn".return_type.?;
+    return struct {
+        pub fn call(x: Arg) Ret {
+            return f(g(x) catch unreachable);
+        }
+    }.call;
 }
 
 const texts = [_][]const u8{ "tar", "flow" };

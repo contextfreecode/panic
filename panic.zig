@@ -27,12 +27,12 @@ fn runLoop(allocator: std.mem.Allocator) void {
 fn processText(allocator: std.mem.Allocator, id: usize) []const u8 {
     // TODO Any kind of nested function pointer example here?
     const text = retrieveText(id) catch @panic("retrieveText failed");
-    // const retrieveSize = compose(struct {
-    //     pub fn len(again: []const u8) usize {
-    //         return again.len;
-    //     }
-    // }.len, retrieveText);
-    // std.debug.print("{} ", .{retrieveSize(id)});
+    const retrieveSize = compose(error{NotFound}, struct {
+        pub fn len(again: []const u8) usize {
+            return again.len;
+        }
+    }.len, retrieveText);
+    std.debug.print("{} ", .{retrieveSize(id) catch unreachable});
     const codes = stringToCodes(allocator, text) catch @panic("stringToCodes failed");
     defer allocator.free(codes);
     std.mem.reverse(u21, codes);
@@ -40,16 +40,18 @@ fn processText(allocator: std.mem.Allocator, id: usize) []const u8 {
 }
 
 pub fn compose(
+    errs: type,
     f: anytype,
     g: anytype,
 ) fn (
     x: @typeInfo(@TypeOf(g)).@"fn".params[0].type.?,
-) @typeInfo(@TypeOf(f)).@"fn".return_type.? {
+) errs!@typeInfo(@TypeOf(f)).@"fn".return_type.? {
+    // const gInfo = @typeInfo(@TypeOf(g));
     const Arg = @typeInfo(@TypeOf(g)).@"fn".params[0].type.?;
     const Ret = @typeInfo(@TypeOf(f)).@"fn".return_type.?;
     return struct {
-        pub fn call(x: Arg) Ret {
-            return f(g(x) catch unreachable);
+        pub fn call(x: Arg) errs!Ret {
+            return f(try g(x));
         }
     }.call;
 }
@@ -57,7 +59,7 @@ pub fn compose(
 const texts = [_][]const u8{ "tar", "flow" };
 // const texts = [_][]const u8{ "tar", "flow", "🐻‍❄️❤️🦭" };
 
-fn retrieveText(id: usize) ![]const u8 {
+fn retrieveText(id: usize) error{NotFound}![]const u8 {
     if (id == 0 or id > texts.len) return error.NotFound;
     return texts[id - 1];
 }

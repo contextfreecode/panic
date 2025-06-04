@@ -19,7 +19,7 @@ fn run(allocator: std.mem.Allocator) void {
             }
         }
     }.loop, .{allocator}) catch |err| {
-        std.debug.print("Error: {}\n", .{err});
+        std.debug.print("error: {}\n", .{err});
     };
 }
 

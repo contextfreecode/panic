@@ -11,7 +11,6 @@ class Panic {
     }
 
     static void run() {
-        // codesToString(List.of(0x110000));
         try {
             IntStream.range(1, 4)
                     .mapToObj(id -> processText(id))

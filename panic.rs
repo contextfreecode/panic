@@ -10,7 +10,6 @@ fn main() {
 fn run() {
     let _hook_disable = PanicHookDisable::new();
     if let Err(err) = panic::catch_unwind(|| {
-        // See https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.map
         for text in (1..=3).map(|x| process_text(x)) {
             println!("{}", text);
         }

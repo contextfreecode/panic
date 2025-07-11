@@ -3,10 +3,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.function.Function;
 
 class Panic {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NotFoundException {
         run();
+        blah();
         System.out.println("Still alive.");
     }
 
@@ -55,10 +57,29 @@ class Panic {
         return text.codePoints().boxed().collect(
                 Collectors.toCollection(ArrayList::new));
     }
+
+    static String blech(String thing) {
+        return thing + thing;
+    }
+
+    public static void blah() throws NotFoundException {
+        // Fn<Integer, String, NotFoundException> parse = Panic::retrieveText;
+        // Fn<String, String, NotFoundException> times2 = Panic::blech;
+        var composed = Fn.compose(Panic::blech, Panic::retrieveText);
+        System.out.println(composed.apply(1));
+    }
 }
 
 class NotFoundException extends Exception {
     public NotFoundException(String message) {
         super(message);
+    }
+}
+
+public interface Fn<A, B, E extends Throwable> {
+    B apply(A a) throws E;
+
+    static <T, U, R, E extends Throwable> Fn<T, R, E> compose(Fn<U, R, E> f, Fn<T, U, E> g) {
+        return x -> f.apply(g.apply(x));
     }
 }
